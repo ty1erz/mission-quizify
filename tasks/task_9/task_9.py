@@ -27,7 +27,8 @@ class QuizManager:
         Note: This initialization method is crucial for setting the foundation of the `QuizManager` class, enabling it to manage the quiz questions effectively. The class will rely on this setup to perform operations such as retrieving specific questions by index and navigating through the quiz.
         """
         ##### YOUR CODE HERE #####
-        pass # Placeholder
+        self.questions = questions
+        self.total_questions=len(questions)
     ##########################################################
 
     def get_question_at_index(self, index: int):
@@ -62,7 +63,9 @@ class QuizManager:
         Note: Ensure that `st.session_state["question_index"]` is initialized before calling this method. This navigation method enhances the user experience by providing fluid access to quiz questions.
         """
         ##### YOUR CODE HERE #####
-        pass  # Placeholder for implementation
+        current_index = st.session_state.get("question_index", 0)
+        new_index = (current_index + direction) % self.total_questions
+        st.session_state["question_index"] = new_index
     ##########################################################
 
 
@@ -71,7 +74,7 @@ if __name__ == "__main__":
     
     embed_config = {
         "model_name": "textembedding-gecko@003",
-        "project": "YOUR-PROJECT-ID-HERE",
+        "project": "gemini-quizify-424503",
         "location": "us-central1"
     }
     
@@ -102,7 +105,7 @@ if __name__ == "__main__":
                 st.write(topic_input)
                 
                 # Test the Quiz Generator
-                generator = QuizGenerator(topic_input, questions, chroma_creator)
+                generator = QuizGenerator(topic_input, questions, chroma_creator.db)
                 question_bank = generator.generate_quiz()
 
     if question_bank:
@@ -112,11 +115,11 @@ if __name__ == "__main__":
             
             # Task 9
             ##########################################################
-            quiz_manager = # Use our new QuizManager class
+            quiz_manager = QuizManager(question_bank)
             # Format the question and display
             with st.form("Multiple Choice Question"):
                 ##### YOUR CODE HERE #####
-                index_question = # Use the get_question_at_index method to set the 0th index
+                index_question = quiz_manager.get_question_at_index(0)
                 ##### YOUR CODE HERE #####
                 
                 # Unpack choices for radio
@@ -126,10 +129,11 @@ if __name__ == "__main__":
                     # Set the key from the index question 
                     # Set the value from the index question
                     ##### YOUR CODE HERE #####
-                    choices.append(f"{key}) {value}")
+                    choices.append(f"{choice['key']}) {choice['value']}")
                 
                 ##### YOUR CODE HERE #####
                 # Display the question onto streamlit
+                st.write(index_question["question"])
                 ##### YOUR CODE HERE #####
                 
                 answer = st.radio( # Display the radio button with the choices
